@@ -1,6 +1,15 @@
 package com.example.stackquestions.models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
+import com.example.stackquestions.util.DataConverter
+
+@Entity(tableName = "Questions")
 data class Question(
+    @PrimaryKey(autoGenerate = true)
+    var id: Int? =null,
     val accepted_answer_id: Int?,
     val answer_count: Int,
     val bounty_amount: Int?,
