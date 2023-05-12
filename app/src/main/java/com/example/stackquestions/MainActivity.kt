@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
             val viewModelProviderFactory = QuestionViewModelProviderFactory(questionRepository)
             val viewModel = ViewModelProvider(this,viewModelProviderFactory)[QuestionViewModel::class.java]
             StackQuestionsTheme {
-                DisplayQuestions(viewModel)
+                MainScreen(viewModel)
             }
         }
     }
