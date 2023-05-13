@@ -1,28 +1,19 @@
 package com.example.stackquestions
 
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -32,39 +23,26 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.constraintlayout.solver.widgets.Helper
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
+import androidx.lifecycle.Observer
 import com.example.stackquestions.models.Question
-import com.example.stackquestions.util.HelperFunctions
+import com.example.stackquestions.helpers.HelperFunctions
+import com.example.stackquestions.models.QuestionResponse
 import com.example.stackquestions.util.Resource
 import com.example.stackquestions.viewmodels.QuestionViewModel
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.concurrent.TimeUnit
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -72,8 +50,8 @@ fun MainScreen(
     viewModel: QuestionViewModel
 ) {
     val questionList = remember { mutableStateListOf<Question>() }
-    LaunchedEffect(Unit) {
-        viewModel.questions.observeForever { response ->
+    DisposableEffect(Unit) {
+        val observer = Observer<Resource<QuestionResponse>> { response ->
             when (response) {
                 is Resource.Success -> {
                     response.data?.let { questionResponse ->
@@ -83,6 +61,10 @@ fun MainScreen(
                 }
                 else -> Log.d("No data is there","Hello ")
             }
+        }
+        viewModel.questions.observeForever(observer)
+        onDispose {
+            viewModel.questions.removeObserver(observer)
         }
     }
     if (questionList.isNotEmpty()) {
@@ -96,6 +78,7 @@ fun MainScreen(
     }
 }
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DisplayQuestionItemUI(
@@ -105,8 +88,7 @@ fun DisplayQuestionItemUI(
     Box(
         modifier = Modifier
             .padding(16.dp)
-            .border(2.dp, Color.Black)
-            .shadow(10.dp, RoundedCornerShape(10.dp))
+            .border(2.dp, Color.Black, RoundedCornerShape(15.dp))
             .fillMaxWidth(),
         content = {
             Row(
@@ -122,7 +104,7 @@ fun DisplayQuestionItemUI(
                             .clip(RoundedCornerShape(10.dp))
                             .fillMaxWidth(0.2f)
                     ) {
-                        LoadImageFromUrl(imageUrl = question.owner.profile_image)
+                        question.owner.profile_image?.let { HelperFunctions.LoadImageFromUrl(imageUrl = it) }
                     }
                     Column(
                         Modifier
@@ -142,7 +124,7 @@ fun DisplayQuestionItemUI(
                             ) {
                                 Text(
                                     text = question.owner.display_name,
-                                    fontSize = 16.sp,
+                                    fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier.padding(bottom = 4.dp),
                                     overflow = TextOverflow.Ellipsis
@@ -161,9 +143,9 @@ fun DisplayQuestionItemUI(
                             )
                             Text(
                                 text = question.title,
-                                fontSize = 16.sp,
-                                lineHeight = 20.sp,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                fontSize = 15.sp,
+                                lineHeight = 14.sp,
+                                modifier = Modifier.padding(bottom = 4.dp)
                             )
                             LazyRow(
                                 modifier = Modifier.fillMaxWidth(),
@@ -202,34 +184,5 @@ fun DisplayQuestionItemUI(
             )
         }
     )
-}
-
-@Composable
-fun LoadImageFromUrl(imageUrl: String) {
-    val context = LocalContext.current
-    var image: ImageBitmap? by remember(imageUrl) {
-        mutableStateOf(null)
-    }
-
-    Glide.with(context)
-        .asBitmap()
-        .load(imageUrl)
-        .into(object : CustomTarget<Bitmap>() {
-            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                image = resource.asImageBitmap()
-            }
-
-            override fun onLoadCleared(placeholder: Drawable?) {}
-        })
-
-    image?.let {
-        Image(
-            bitmap = it,
-            contentDescription = "Image loaded from URL",
-            modifier = Modifier
-                .clip(RoundedCornerShape(10.dp))
-                .fillMaxSize()
-        )
-    }
 }
 

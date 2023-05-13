@@ -1,8 +1,10 @@
 package com.example.stackquestions
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.stackquestions.db.QuestionDatabase
@@ -11,6 +13,7 @@ import com.example.stackquestions.ui.theme.StackQuestionsTheme
 import com.example.stackquestions.viewmodels.QuestionViewModel
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
