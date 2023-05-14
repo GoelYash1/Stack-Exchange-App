@@ -14,15 +14,16 @@ import kotlinx.coroutines.flow.flow
 
 class QuestionRepository(
     private val db: QuestionDatabase
-):ViewModel() {
+): ViewModel() {
     private val questionDao = db.questionDao()
-    fun getQuestions(pageNumber: Int) = networkBoundResource(
+
+    fun getQuestions(pageNumber: Int, pageSize: Int): Flow<Resource<List<Question>>> = networkBoundResource(
         query = {
-            questionDao.getAllQuestions()
+            questionDao.getQuestionsPaginated(pageSize, (pageNumber - 1) * pageSize)
         },
         fetch = {
             delay(2000)
-            StackExchangeClient.api.getQuestionDetails(pageNumber = pageNumber)
+            StackExchangeClient.api.getQuestionDetails(pageNumber = pageNumber, pageSize = pageSize)
         },
         saveFetchResult = { questions ->
             db.withTransaction {
@@ -36,20 +37,21 @@ class QuestionRepository(
                         true
                     }
                 }
-                questionDao.deleteNonFavouriteQuestions()
                 questionDao.insertQuestions(newQuestions)
             }
         }
     )
-    fun getSearchResults(queryText: String,pageNumber: Int): Flow<Resource<List<Question>>> = flow {
+
+    fun getSearchResults(queryText: String, pageNumber: Int, pageSize: Int): Flow<Resource<List<Question>>> = flow {
         emit(Resource.Loading())
         try {
-            val searchResults = StackExchangeClient.api.getFilteredQuestions(queryText,pageNumber).items
+            val searchResults = StackExchangeClient.api.getFilteredQuestions(searchQuery = queryText, pageNumber = pageNumber, pageSize = pageSize).items
             emit(Resource.Success(searchResults))
         } catch (throwable: Throwable) {
             emit(Resource.Error(throwable))
         }
     }
+
     suspend fun updateQuestion(question: Question) {
         questionDao.updateQuestion(question)
     }

@@ -13,8 +13,10 @@ import kotlinx.coroutines.launch
 
 class QuestionViewModel(
     private val questionRepository: QuestionRepository
-):ViewModel() {
-    private var questionPage = 1
+): ViewModel() {
+    private var currentPage = 1
+    private val pageSize = 30
+
     private val _questions = MediatorLiveData<Resource<List<Question>>>()
     val questions: LiveData<Resource<List<Question>>> = _questions
 
@@ -22,22 +24,29 @@ class QuestionViewModel(
     val refreshing: LiveData<Boolean> = _refreshing
 
     init {
-        _questions.addSource(questionRepository.getQuestions(questionPage).asLiveData()) { result ->
-            _questions.value = result
-        }
+        getQuestions()
     }
+
     fun favoriteQuestion(question: Question, isFavorite: Boolean) {
         viewModelScope.launch {
             question.is_favourite = isFavorite
             questionRepository.updateQuestion(question)
         }
     }
-    fun updateQuestions() {
-        _refreshing.value = true
-        _questions.removeSource(questions)
-        _questions.addSource(questionRepository.getQuestions(questionPage).asLiveData()) { result ->
+
+    fun updateQuestions(isSwipeRefresh: Boolean = false) {
+        if (isSwipeRefresh) {
+            currentPage = 1
+        } else {
+            currentPage++
+        }
+        getQuestions()
+    }
+
+
+    private fun getQuestions() {
+        _questions.addSource(questionRepository.getQuestions(currentPage, pageSize).asLiveData()) { result ->
             _questions.value = result
-            _refreshing.value = false
         }
     }
 }

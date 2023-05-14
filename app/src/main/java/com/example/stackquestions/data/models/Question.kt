@@ -8,8 +8,8 @@ import com.example.stackquestions.util.DataConverter
 
 @Entity(tableName = "Questions")
 data class Question(
-    @PrimaryKey(autoGenerate = true)
-    var id: Int? =null,
+    val link: String,
+    val question_id: Int,
     val accepted_answer_id: Int?,
     val answer_count: Int,
     val bounty_amount: Int?,
@@ -19,12 +19,10 @@ data class Question(
     val is_answered: Boolean,
     val last_activity_date: Int,
     val last_edit_date: Int?,
-    val link: String,
     val owner: Owner,
-    val question_id: Int,
     val score: Int,
     val tags: List<String>,
-    val title: String,
+    @PrimaryKey val title: String,
     val view_count: Int,
     var is_favourite: Boolean?
 )

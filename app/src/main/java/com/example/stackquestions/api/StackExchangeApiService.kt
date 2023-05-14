@@ -11,6 +11,7 @@ interface StackExchangeApiService{
     suspend fun getQuestionDetails(
         @Query("apikey") key: String = API_KEY,
         @Query("page")pageNumber: Int,
+        @Query("pagesize")pageSize: Int,
         @Query("site") site: String = "stackoverflow"
     ): QuestionResponse
 
@@ -18,6 +19,7 @@ interface StackExchangeApiService{
     suspend fun getFilteredQuestions(
         @Query("q") searchQuery:String,
         @Query("page")pageNumber: Int,
+        @Query("pagesize")pageSize: Int,
         @Query("apikey") key: String = API_KEY,
         @Query("site") site: String = "stackoverflow"
     ): QuestionResponse
