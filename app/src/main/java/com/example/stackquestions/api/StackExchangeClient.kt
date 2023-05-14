@@ -21,7 +21,7 @@ class StackExchangeClient {
                 .client(client)
                 .build()
         }
-        val api by lazy{
+        val api: StackExchangeApiService by lazy{
             retrofit.create(StackExchangeApiService::class.java)
         }
     }

@@ -1,4 +1,4 @@
-package com.example.stackquestions.models
+package com.example.stackquestions.data.models
 
 data class QuestionResponse(
     val has_more: Boolean,

@@ -1,7 +1,7 @@
 package com.example.stackquestions.util
 
 import androidx.room.TypeConverter
-import com.example.stackquestions.models.Owner
+import com.example.stackquestions.data.models.Owner
 import com.google.gson.GsonBuilder
 
 class DataConverter {
