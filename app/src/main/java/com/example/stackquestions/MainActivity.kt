@@ -8,9 +8,10 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
 import com.example.stackquestions.data.QuestionDatabase
 import com.example.stackquestions.data.QuestionRepository
+import com.example.stackquestions.presentations.questionScreen.MainScreen
 import com.example.stackquestions.ui.theme.StackQuestionsTheme
-import com.example.stackquestions.viewmodels.QuestionViewModel
-import com.example.stackquestions.viewmodels.QuestionViewModelProviderFactory
+import com.example.stackquestions.presentations.questionScreen.viewmodels.QuestionViewModel
+import com.example.stackquestions.presentations.questionScreen.viewmodels.QuestionViewModelProviderFactory
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -18,10 +19,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val questionRepository = QuestionRepository(QuestionDatabase(this))
-            val viewModelProviderFactory = QuestionViewModelProviderFactory(questionRepository)
-            val viewModel = ViewModelProvider(this,viewModelProviderFactory)[QuestionViewModel::class.java]
+            val questionViewModelProviderFactory = QuestionViewModelProviderFactory(questionRepository)
+            val questionViewModel = ViewModelProvider(this,questionViewModelProviderFactory)[QuestionViewModel::class.java]
             StackQuestionsTheme {
-                MainScreen(viewModel)
+                MainScreen(questionViewModel)
             }
         }
     }

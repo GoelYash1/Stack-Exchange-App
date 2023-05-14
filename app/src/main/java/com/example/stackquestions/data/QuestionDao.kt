@@ -10,12 +10,13 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface QuestionDao {
-    @Query("SELECT * FROM Questions")
+    @Query("SELECT * FROM Questions ORDER BY creation_date DESC")
     fun getAllQuestions(): Flow<List<Question>>
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertQuestions(questions: List<Question>)
     @Update
     suspend fun updateQuestion(question: Question)
-    @Query("DELETE FROM Questions WHERE is_favourite = 0")
-    suspend fun deleteQuestions()
+    @Query("DELETE FROM Questions WHERE is_favourite IS NULL OR is_favourite = 0")
+    suspend fun deleteNonFavouriteQuestions()
+
 }
