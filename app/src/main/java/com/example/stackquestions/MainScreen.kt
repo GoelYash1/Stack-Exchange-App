@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -55,19 +54,11 @@ fun MainScreen(viewModel: QuestionViewModel) {
     val refreshing by viewModel.refreshing.observeAsState()
     when (questions) {
         is Resource.Success -> {
-            val questionList = (questions as Resource.Success<List<Question>>).data
-            if (questionList != null) {
-                LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    itemsIndexed(questionList) { index, question ->
-                        DisplayQuestionItemUI(question = question, viewModel)
-                        val itemCount = questionList.size
-                        if (index == itemCount - 1) {
-                            viewModel.loadMoreQuestions()
-                        }
+            val questionList = ((questions as Resource.Success<List<Question>>).data)
+            if (questionList!=null){
+                LazyColumn {
+                    items(questionList) { question ->
+                        DisplayQuestionItemUI(question = question,viewModel)
                     }
                 }
             }
