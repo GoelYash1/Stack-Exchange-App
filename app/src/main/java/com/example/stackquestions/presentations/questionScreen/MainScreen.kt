@@ -49,7 +49,7 @@ fun MainScreen(questionViewModel: QuestionViewModel, searchViewModel: SearchView
                 ManageSearchQueryEmpty(questionViewModel)
                 PullRefreshIndicator(refreshing = refreshing?:false, state = ptrState, modifier = Modifier.align(Alignment.TopCenter))
             } else {
-                ManageSearchQueryNotEmpty(searchQuery, questionViewModel, searchViewModel)
+                ManageSearchQueryNotEmpty(questionViewModel, searchViewModel)
             }
         }
     }

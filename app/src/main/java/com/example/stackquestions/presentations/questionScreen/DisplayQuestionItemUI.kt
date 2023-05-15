@@ -1,8 +1,10 @@
 package com.example.stackquestions.presentations.questionScreen
 
 import android.os.Build
+import android.webkit.WebView
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -25,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import com.example.stackquestions.data.models.Question
 import com.example.stackquestions.helpers.HelperFunctions
@@ -36,9 +43,13 @@ fun DisplayQuestionItemUI(
     question: Question,
     viewModel: QuestionViewModel
 ) {
+    var showWebView by remember { mutableStateOf(false) }
     val minutesAgo = HelperFunctions.getTimeAgo(question.creation_date.toLong())
     Box(
         modifier = Modifier
+            .clickable(
+                onClick = {showWebView = true}
+            )
             .padding(16.dp)
             .border(2.dp, Color.Black, RoundedCornerShape(15.dp))
             .fillMaxWidth(),
@@ -131,6 +142,24 @@ fun DisplayQuestionItemUI(
                     )
                 }
             )
+            if (showWebView) {
+                WebViewComponent(url = question.link)
+            }
+        }
+    )
+}
+
+@Composable
+fun WebViewComponent(url: String) {
+    AndroidView(
+        factory = { context ->
+            WebView(context).apply {
+                // WebView settings can be configured here
+                settings.javaScriptEnabled = true
+            }
+        },
+        update = { webView ->
+            webView.loadUrl(url)
         }
     )
 }

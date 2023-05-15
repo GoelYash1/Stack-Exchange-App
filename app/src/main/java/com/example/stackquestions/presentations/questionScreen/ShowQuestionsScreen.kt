@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.stackquestions.data.models.Question
 import com.example.stackquestions.viewmodels.questionviewmodel.QuestionViewModel
 import com.example.stackquestions.viewmodels.searchviewmodel.SearchViewModel
@@ -107,7 +108,6 @@ fun ManageSearchQueryEmpty(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ManageSearchQueryNotEmpty(
-    searchQuery: String,
     questionViewModel: QuestionViewModel,
     searchViewModel: SearchViewModel
 ) {
