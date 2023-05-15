@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,9 +34,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import com.example.stackquestions.data.models.Question
 import com.example.stackquestions.helpers.HelperFunctions
+import com.example.stackquestions.presentations.webviewscreen.WebViewScreen
 import com.example.stackquestions.viewmodels.questionviewmodel.QuestionViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -43,13 +47,13 @@ fun DisplayQuestionItemUI(
     question: Question,
     viewModel: QuestionViewModel
 ) {
-    var showWebView by remember { mutableStateOf(false) }
+    val showWebViewDialog = remember { mutableStateOf(false) }
     val minutesAgo = HelperFunctions.getTimeAgo(question.creation_date.toLong())
     Box(
         modifier = Modifier
-            .clickable(
-                onClick = {showWebView = true}
-            )
+            .clickable {
+                showWebViewDialog.value = true
+            }
             .padding(16.dp)
             .border(2.dp, Color.Black, RoundedCornerShape(15.dp))
             .fillMaxWidth(),
@@ -142,8 +146,23 @@ fun DisplayQuestionItemUI(
                     )
                 }
             )
-            if (showWebView) {
-                WebViewComponent(url = question.link)
+            if (showWebViewDialog.value) {
+                Dialog(
+                    onDismissRequest = { showWebViewDialog.value = false }
+                ) {
+                    AlertDialog(
+                        onDismissRequest = { showWebViewDialog.value = false },
+                        title = { Text(text = "Web View") },
+                        text = {
+                            WebViewScreen(url = question.link)
+                        },
+                        confirmButton = {
+                            Button(onClick = { showWebViewDialog.value = false }) {
+                                Text(text = "Close")
+                            }
+                        }
+                    )
+                }
             }
         }
     )
