@@ -1,4 +1,4 @@
-package com.example.stackquestions.presentations.questionScreen.viewmodels.searchviewmodel
+package com.example.stackquestions.viewmodels.searchviewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

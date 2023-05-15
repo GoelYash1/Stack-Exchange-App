@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.stackquestions.data.models.Question
-import com.example.stackquestions.presentations.questionScreen.viewmodels.questionviewmodel.QuestionViewModel
+import com.example.stackquestions.viewmodels.questionviewmodel.QuestionViewModel
 
 @Composable
 fun FavouriteIcon(

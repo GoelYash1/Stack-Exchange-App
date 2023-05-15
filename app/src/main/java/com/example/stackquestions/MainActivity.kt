@@ -20,10 +20,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.stackquestions.data.QuestionDatabase
 import com.example.stackquestions.data.QuestionRepository
 import com.example.stackquestions.presentations.questionScreen.MainScreen
-import com.example.stackquestions.presentations.questionScreen.viewmodels.questionviewmodel.QuestionViewModel
-import com.example.stackquestions.presentations.questionScreen.viewmodels.questionviewmodel.QuestionViewModelProviderFactory
-import com.example.stackquestions.presentations.questionScreen.viewmodels.searchviewmodel.SearchViewModel
-import com.example.stackquestions.presentations.questionScreen.viewmodels.searchviewmodel.SearchViewModelFactory
+import com.example.stackquestions.viewmodels.questionviewmodel.QuestionViewModel
+import com.example.stackquestions.viewmodels.questionviewmodel.QuestionViewModelProviderFactory
+import com.example.stackquestions.viewmodels.searchviewmodel.SearchViewModel
+import com.example.stackquestions.viewmodels.searchviewmodel.SearchViewModelFactory
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)

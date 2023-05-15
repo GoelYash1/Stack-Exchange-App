@@ -1,4 +1,4 @@
-package com.example.stackquestions.presentations.questionScreen.viewmodels.questionviewmodel
+package com.example.stackquestions.viewmodels.questionviewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

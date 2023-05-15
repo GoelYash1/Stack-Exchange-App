@@ -23,8 +23,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.stackquestions.data.models.Question
-import com.example.stackquestions.presentations.questionScreen.viewmodels.questionviewmodel.QuestionViewModel
-import com.example.stackquestions.presentations.questionScreen.viewmodels.searchviewmodel.SearchViewModel
+import com.example.stackquestions.viewmodels.questionviewmodel.QuestionViewModel
+import com.example.stackquestions.viewmodels.searchviewmodel.SearchViewModel
 import com.example.stackquestions.util.Resource
 
 @RequiresApi(Build.VERSION_CODES.O)
