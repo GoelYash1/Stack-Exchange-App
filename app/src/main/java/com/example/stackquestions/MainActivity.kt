@@ -24,12 +24,14 @@ import com.example.stackquestions.viewmodels.questionviewmodel.QuestionViewModel
 import com.example.stackquestions.viewmodels.questionviewmodel.QuestionViewModelProviderFactory
 import com.example.stackquestions.viewmodels.searchviewmodel.SearchViewModel
 import com.example.stackquestions.viewmodels.searchviewmodel.SearchViewModelFactory
+import com.google.android.gms.ads.MobileAds
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MobileAds.initialize(this)
         setContent {
             val questionRepository = QuestionRepository(QuestionDatabase(this))
             val questionViewModelProviderFactory = QuestionViewModelProviderFactory(questionRepository)

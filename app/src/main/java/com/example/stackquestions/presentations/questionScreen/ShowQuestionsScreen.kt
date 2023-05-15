@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,11 +24,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
+import androidx.compose.ui.viewinterop.AndroidView
 import com.example.stackquestions.data.models.Question
+import com.example.stackquestions.util.Resource
 import com.example.stackquestions.viewmodels.questionviewmodel.QuestionViewModel
 import com.example.stackquestions.viewmodels.searchviewmodel.SearchViewModel
-import com.example.stackquestions.util.Resource
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -36,17 +41,23 @@ fun ManageSearchQueryEmpty(
     val questions by questionViewModel.questions.observeAsState()
     when (questions) {
         is Resource.Success -> {
-            val questionList = ((questions as Resource.Success<List<Question>>).data)
-            if (questionList!=null){
+            val questionList = (questions as Resource.Success<List<Question>>).data
+            if (questionList != null) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(questionList) { question ->
-                        DisplayQuestionItemUI(question = question,questionViewModel)
+                    itemsIndexed(questionList) { index, question ->
+                        DisplayQuestionItemUI(question = question, questionViewModel)
+
+                        // Show ad after every fifth element
+                        if ((index + 1) % 5 == 0 && index != questionList.lastIndex) {
+                            AdComponent()
+                        }
                     }
                 }
             }
         }
+
         is Resource.Loading -> {
             Box(
                 contentAlignment = Alignment.Center,
@@ -156,4 +167,19 @@ fun ManageSearchQueryNotEmpty(
             }
         }
     }
+}
+
+@Composable
+fun AdComponent() {
+    val context = LocalContext.current
+    val adRequest = remember { AdRequest.Builder().build() }
+    AndroidView(
+        factory = { context ->
+            AdView(context).apply {
+                adUnitId = "ca-app-pub-3940256099942544/6300978111"
+                setAdSize(AdSize.BANNER)
+                loadAd(adRequest)
+            }
+        }
+    )
 }
