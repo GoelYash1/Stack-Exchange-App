@@ -9,13 +9,18 @@ import androidx.lifecycle.viewModelScope
 import com.example.stackquestions.data.QuestionRepository
 import com.example.stackquestions.data.models.Question
 import com.example.stackquestions.util.Resource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class QuestionViewModel(
     private val questionRepository: QuestionRepository
-): ViewModel() {
+) : ViewModel() {
     private val _questions = MediatorLiveData<Resource<List<Question>>>()
     val questions: LiveData<Resource<List<Question>>> = _questions
+
+    private val _favoriteQuestions = MutableLiveData<List<Question>>()
+    val favoriteQuestions: LiveData<List<Question>> = _favoriteQuestions
 
     private val _refreshing = MutableLiveData<Boolean>()
     val refreshing: LiveData<Boolean> = _refreshing
@@ -24,12 +29,31 @@ class QuestionViewModel(
         _questions.addSource(questionRepository.getQuestions().asLiveData()) { result ->
             _questions.value = result
         }
+        loadFavoriteQuestions()
+    }
+
+    private fun loadFavoriteQuestions() {
+        viewModelScope.launch {
+            val favoriteQuestions = withContext(Dispatchers.IO) {
+                questionRepository.getFavoriteQuestions()
+            }
+            _favoriteQuestions.value = favoriteQuestions
+        }
     }
 
     fun favoriteQuestion(question: Question, isFavorite: Boolean) {
         viewModelScope.launch {
-            question.is_favourite = isFavorite
-            questionRepository.updateQuestion(question)
+            withContext(Dispatchers.IO) {
+                question.is_favourite = isFavorite
+                questionRepository.updateQuestion(question)
+            }
+
+            if (isFavorite) {
+                _favoriteQuestions.value = (_favoriteQuestions.value ?: emptyList()) + question
+            } else {
+                _favoriteQuestions.value =
+                    (_favoriteQuestions.value ?: emptyList()).filter { it.question_id != question.question_id }
+            }
         }
     }
 
@@ -42,3 +66,4 @@ class QuestionViewModel(
         }
     }
 }
+

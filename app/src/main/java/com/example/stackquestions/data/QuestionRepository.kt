@@ -52,6 +52,9 @@ class QuestionRepository(
             emit(Resource.Error(throwable))
         }
     }
+    fun getFavoriteQuestions(): List<Question> {
+        return questionDao.getFavoriteQuestions()
+    }
 
     suspend fun updateQuestion(question: Question) {
         questionDao.updateQuestion(question)

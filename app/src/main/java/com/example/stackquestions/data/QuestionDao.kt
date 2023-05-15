@@ -18,4 +18,6 @@ interface QuestionDao {
     suspend fun updateQuestion(question: Question)
     @Query("DELETE FROM Questions WHERE is_favourite IS NULL OR is_favourite = 0")
     suspend fun deleteNonFavouriteQuestions()
+    @Query("SELECT * FROM Questions WHERE is_favourite = 1 ORDER BY creation_date DESC")
+    fun getFavoriteQuestions(): List<Question>
 }
