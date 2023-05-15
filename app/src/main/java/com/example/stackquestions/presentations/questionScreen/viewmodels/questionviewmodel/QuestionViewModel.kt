@@ -1,4 +1,4 @@
-package com.example.stackquestions.presentations.questionScreen.viewmodels
+package com.example.stackquestions.presentations.questionScreen.viewmodels.questionviewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -14,9 +14,6 @@ import kotlinx.coroutines.launch
 class QuestionViewModel(
     private val questionRepository: QuestionRepository
 ): ViewModel() {
-    private var currentPage = 1
-    private val pageSize = 30
-
     private val _questions = MediatorLiveData<Resource<List<Question>>>()
     val questions: LiveData<Resource<List<Question>>> = _questions
 
@@ -24,7 +21,9 @@ class QuestionViewModel(
     val refreshing: LiveData<Boolean> = _refreshing
 
     init {
-        getQuestions()
+        _questions.addSource(questionRepository.getQuestions().asLiveData()) { result ->
+            _questions.value = result
+        }
     }
 
     fun favoriteQuestion(question: Question, isFavorite: Boolean) {
@@ -34,19 +33,12 @@ class QuestionViewModel(
         }
     }
 
-    fun updateQuestions(isSwipeRefresh: Boolean = false) {
-        if (isSwipeRefresh) {
-            currentPage = 1
-        } else {
-            currentPage++
-        }
-        getQuestions()
-    }
-
-
-    private fun getQuestions() {
-        _questions.addSource(questionRepository.getQuestions(currentPage, pageSize).asLiveData()) { result ->
+    fun updateQuestions() {
+        _refreshing.value = true
+        _questions.removeSource(questions)
+        _questions.addSource(questionRepository.getQuestions().asLiveData()) { result ->
             _questions.value = result
+            _refreshing.value = false
         }
     }
 }

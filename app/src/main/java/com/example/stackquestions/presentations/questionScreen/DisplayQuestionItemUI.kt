@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.stackquestions.data.models.Question
 import com.example.stackquestions.helpers.HelperFunctions
-import com.example.stackquestions.presentations.questionScreen.viewmodels.QuestionViewModel
+import com.example.stackquestions.presentations.questionScreen.viewmodels.questionviewmodel.QuestionViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

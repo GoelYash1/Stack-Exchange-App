@@ -17,13 +17,13 @@ class QuestionRepository(
 ): ViewModel() {
     private val questionDao = db.questionDao()
 
-    fun getQuestions(pageNumber: Int, pageSize: Int): Flow<Resource<List<Question>>> = networkBoundResource(
+    fun getQuestions(): Flow<Resource<List<Question>>> = networkBoundResource(
         query = {
-            questionDao.getQuestionsPaginated(pageSize, (pageNumber - 1) * pageSize)
+            questionDao.getAllQuestions()
         },
         fetch = {
             delay(2000)
-            StackExchangeClient.api.getQuestionDetails(pageNumber = pageNumber, pageSize = pageSize)
+            StackExchangeClient.api.getQuestionDetails()
         },
         saveFetchResult = { questions ->
             db.withTransaction {
@@ -37,15 +37,16 @@ class QuestionRepository(
                         true
                     }
                 }
+                questionDao.deleteNonFavouriteQuestions()
                 questionDao.insertQuestions(newQuestions)
             }
         }
     )
 
-    fun getSearchResults(queryText: String, pageNumber: Int, pageSize: Int): Flow<Resource<List<Question>>> = flow {
+    fun getSearchResults(queryText: String): Flow<Resource<List<Question>>> = flow {
         emit(Resource.Loading())
         try {
-            val searchResults = StackExchangeClient.api.getFilteredQuestions(searchQuery = queryText, pageNumber = pageNumber, pageSize = pageSize).items
+            val searchResults = StackExchangeClient.api.getFilteredQuestions(searchQuery = queryText).items
             emit(Resource.Success(searchResults))
         } catch (throwable: Throwable) {
             emit(Resource.Error(throwable))

@@ -20,12 +20,18 @@ inline fun <ResultType, RequestType> networkBoundResource(
 
         try {
             saveFetchResult(fetch())
-            query().map { Resource.Success(it) }
+            query().map {
+                Resource.Success(it)
+            }
         } catch (throwable: Throwable) {
-            query().map { Resource.Error(throwable, it) }
+            query().map {
+                Resource.Error(throwable, it)
+            }
         }
     } else {
-        query().map { Resource.Success(it) }
+        query().map {
+            Resource.Success(it)
+        }
     }
 
     emitAll(flow)

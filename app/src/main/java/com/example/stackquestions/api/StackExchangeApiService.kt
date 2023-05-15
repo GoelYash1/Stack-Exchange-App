@@ -7,19 +7,15 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface StackExchangeApiService{
-    @GET("questions?sort=creation&order=desc")
+    @GET("questions?pagesize=100&sort=creation&order=desc")
     suspend fun getQuestionDetails(
         @Query("apikey") key: String = API_KEY,
-        @Query("page")pageNumber: Int,
-        @Query("pagesize")pageSize: Int,
         @Query("site") site: String = "stackoverflow"
     ): QuestionResponse
 
-    @GET("search/advanced?order=desc&sort=creation")
+    @GET("search/advanced?pagesize=100&order=activity&sort=creation")
     suspend fun getFilteredQuestions(
         @Query("q") searchQuery:String,
-        @Query("page")pageNumber: Int,
-        @Query("pagesize")pageSize: Int,
         @Query("apikey") key: String = API_KEY,
         @Query("site") site: String = "stackoverflow"
     ): QuestionResponse

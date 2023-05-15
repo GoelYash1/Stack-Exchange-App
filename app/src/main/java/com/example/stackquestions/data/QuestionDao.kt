@@ -10,15 +10,12 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface QuestionDao {
-    @Query("SELECT * FROM Questions ORDER BY creation_date DESC LIMIT :limit OFFSET :offset")
-    fun getQuestionsPaginated(limit: Int, offset: Int): Flow<List<Question>>
-
     @Query("SELECT * FROM Questions ORDER BY creation_date DESC")
     fun getAllQuestions(): Flow<List<Question>>
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertQuestions(questions: List<Question>)
     @Update
     suspend fun updateQuestion(question: Question)
-//    @Query("DELETE FROM Questions WHERE is_favourite IS NULL OR is_favourite = 0")
-//    suspend fun deleteNonFavouriteQuestions()
+    @Query("DELETE FROM Questions WHERE is_favourite IS NULL OR is_favourite = 0")
+    suspend fun deleteNonFavouriteQuestions()
 }
