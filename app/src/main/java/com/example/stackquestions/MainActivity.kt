@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.stackquestions.data.QuestionDatabase
 import com.example.stackquestions.data.QuestionRepository
 import com.example.stackquestions.presentations.favouriteQuestionScreen.FavouriteQuestionScreen
+import com.example.stackquestions.presentations.filterScreen.FilterScreen
 import com.example.stackquestions.presentations.questionScreen.MainScreen
 import com.example.stackquestions.viewmodels.questionviewmodel.QuestionViewModel
 import com.example.stackquestions.viewmodels.questionviewmodel.QuestionViewModelProviderFactory
@@ -73,7 +74,7 @@ fun MainNavigation(
         }
         composable(Filter.route)
         {
-
+            FilterScreen()
         }
         composable(Favourites.route)
         {

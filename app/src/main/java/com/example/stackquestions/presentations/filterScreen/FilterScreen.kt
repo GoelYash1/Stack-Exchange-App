@@ -10,7 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun filterScreen(){
+fun FilterScreen(){
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(text = "A work in progress", fontWeight = FontWeight.ExtraBold, fontSize = 24.sp)
     }
