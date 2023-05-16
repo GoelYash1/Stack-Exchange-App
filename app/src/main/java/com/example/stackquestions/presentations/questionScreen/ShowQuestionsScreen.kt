@@ -7,16 +7,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -124,31 +129,74 @@ fun ManageSearchQueryNotEmpty(
     searchViewModel: SearchViewModel
 ) {
     val filteredQuestions by searchViewModel.filteredQuestions.observeAsState()
-    val selectedTags = searchViewModel.selectedChips.value ?: emptySet()
+    var selectedTags by remember { mutableStateOf(searchViewModel.selectedChips.value ?: emptySet()) }
 
-    when (filteredQuestions) {
-        is Resource.Success -> {
-            val questionList = (filteredQuestions as Resource.Success<List<Question>>).data
-            val filteredList = if (selectedTags.isNotEmpty()) {
-                questionList?.filter { question ->
-                    question.tags.any { selectedTags.contains(it) }
-                }
-            } else {
-                questionList
+    Column(Modifier.fillMaxWidth()) {
+        if (selectedTags.isNotEmpty()) {
+            Button(onClick = {
+                selectedTags = emptySet() // Clear the selectedTags
+                searchViewModel.selectedChips.value?.clear()
+            }, shape = CircleShape) {
+                Text(text = "Clear Filters")
             }
+        }
+        when (filteredQuestions) {
+            is Resource.Success -> {
+                val questionList = (filteredQuestions as Resource.Success<List<Question>>).data
+                val filteredList = if (selectedTags.isNotEmpty()) {
+                    questionList?.filter { question ->
+                        question.tags.any { selectedTags.contains(it) }
+                    }
+                } else {
+                    questionList
+                }
 
-            if (!filteredList.isNullOrEmpty()) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    itemsIndexed(filteredList) { index, question ->
-                        DisplayQuestionItemUI(question = question, questionViewModel)
-                        if ((index + 1) % 5 == 0 && index != filteredList.lastIndex) {
-                            AdComponent()
+                if (!filteredList.isNullOrEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        itemsIndexed(filteredList) { index, question ->
+                            DisplayQuestionItemUI(question = question, questionViewModel)
+                            if ((index + 1) % 5 == 0 && index != filteredList.lastIndex) {
+                                AdComponent()
+                            }
                         }
                     }
+                } else {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text(
+                            text = "No matching search results found :(",
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
-            } else {
+            }
+
+            is Resource.Loading -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is Resource.Error -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Text(
+                        text = "Error occurred while loading questions.\n${searchViewModel.errorMessage.value}",
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            else -> {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.fillMaxSize()
@@ -158,36 +206,6 @@ fun ManageSearchQueryNotEmpty(
                         textAlign = TextAlign.Center
                     )
                 }
-            }
-        }
-        is Resource.Loading -> {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                CircularProgressIndicator()
-            }
-        }
-        is Resource.Error -> {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text(
-                    text = "Error occurred while loading questions.\n${searchViewModel.errorMessage.value}",
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-        else -> {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text(
-                    text = "No matching search results found :(",
-                    textAlign = TextAlign.Center
-                )
             }
         }
     }

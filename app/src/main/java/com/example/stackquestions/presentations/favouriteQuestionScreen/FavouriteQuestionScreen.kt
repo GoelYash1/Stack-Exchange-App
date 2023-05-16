@@ -2,6 +2,7 @@ package com.example.stackquestions.presentations.favouriteQuestionScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -35,12 +37,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.stackquestions.data.models.Question
+import com.example.stackquestions.presentations.webviewscreen.WebViewScreen
 import com.example.stackquestions.viewmodels.questionviewmodel.QuestionViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FavouriteQuestionScreen(questionViewModel: QuestionViewModel) {
-    val favouriteQuestions = questionViewModel.favoriteQuestions
+    val favouriteQuestions by questionViewModel.favoriteQuestions.observeAsState()
+    val confirmDeleteItem = remember { mutableStateOf<Question?>(null) }
+
     Column(
         Modifier
             .fillMaxWidth()
@@ -48,7 +53,7 @@ fun FavouriteQuestionScreen(questionViewModel: QuestionViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "FAVOURITES", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Cyan)
-        if (favouriteQuestions.value?.isEmpty() == true) {
+        if (favouriteQuestions.isNullOrEmpty()) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -67,18 +72,19 @@ fun FavouriteQuestionScreen(questionViewModel: QuestionViewModel) {
                     textAlign = TextAlign.Center
                 )
             }
-        } else {
-            var confirmDeleteItem = remember { mutableStateOf<Question?>(null) }
+        }
+        else {
+            // Display the list of favorite questions
             Column(Modifier.fillMaxWidth()) {
                 Row(
                     Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
-                        .background(MaterialTheme.colorScheme.error,RoundedCornerShape(10.dp)),
+                        .background(MaterialTheme.colorScheme.error, RoundedCornerShape(10.dp)),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Swipe an item to remove from favourites",
+                        text = "Swipe an item to remove from favorites",
                         fontWeight = FontWeight.Medium,
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center,
@@ -86,7 +92,7 @@ fun FavouriteQuestionScreen(questionViewModel: QuestionViewModel) {
                     )
                 }
                 LazyColumn {
-                    items(favouriteQuestions.value!!) { item ->
+                    items(favouriteQuestions!!) { item ->
                         val currentItem by rememberUpdatedState(item)
                         val dismissState = rememberDismissState(
                             confirmStateChange = {
@@ -104,34 +110,35 @@ fun FavouriteQuestionScreen(questionViewModel: QuestionViewModel) {
                     }
                 }
             }
+        }
 
-            val itemToDelete = confirmDeleteItem.value
-            if (itemToDelete != null) {
-                AlertDialog(
-                    onDismissRequest = { confirmDeleteItem.value = null },
-                    title = { Text(text = "Delete Item") },
-                    text = { Text(text = "Are you sure you want to delete this item?") },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                questionViewModel.favoriteQuestion(itemToDelete, false)
-                                confirmDeleteItem.value = null
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                        ) {
-                            Text(text = "Delete")
-                        }
-                    },
-                    dismissButton = {
-                        Button(onClick = { confirmDeleteItem.value = null }) {
-                            Text(text = "Cancel")
-                        }
+        val itemToDelete = confirmDeleteItem.value
+        if (itemToDelete != null) {
+            AlertDialog(
+                onDismissRequest = { confirmDeleteItem.value = null },
+                title = { Text(text = "Delete Item") },
+                text = { Text(text = "Are you sure you want to delete this item?") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            questionViewModel.favoriteQuestion(itemToDelete, false)
+                            confirmDeleteItem.value = null
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                    ) {
+                        Text(text = "Delete")
                     }
-                )
-            }
+                },
+                dismissButton = {
+                    Button(onClick = { confirmDeleteItem.value = null }) {
+                        Text(text = "Cancel")
+                    }
+                }
+            )
         }
     }
 }
+
 @Composable
 fun FavouriteQuestionItem(item: Question) {
     Box(
