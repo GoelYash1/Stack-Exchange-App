@@ -74,7 +74,7 @@ fun MainNavigation(
         }
         composable(Filter.route)
         {
-            FilterScreen()
+            FilterScreen(searchViewModel, mainNavController)
         }
         composable(Favourites.route)
         {

@@ -10,7 +10,6 @@ import com.example.stackquestions.util.Resource
 import kotlinx.coroutines.launch
 
 class SearchViewModel(private val repository: QuestionRepository) : ViewModel() {
-    var editTextValue = ""
     private val _allQuestions = MutableLiveData<Resource<List<Question>>>()
 
     private val _filteredQuestions = MutableLiveData<Resource<List<Question>>>()
@@ -45,11 +44,11 @@ class SearchViewModel(private val repository: QuestionRepository) : ViewModel() 
                                 .toMutableList()
                         _tagsList.value = newList
                         _allQuestions.value = Resource.Success(resource.data)
-                        _filteredQuestions.value = Resource.Success(resource.data)
+                        _filteredQuestions.value = resource
                     }
 
                     is Resource.Error -> {
-                        _filteredQuestions.value = Resource.Error(Throwable(), null)
+                        _filteredQuestions.value = resource
                         _tagsList.value = mutableListOf()
                         _allQuestions.value = Resource.Success(listOf())
                         _errorMessage.value = resource.error?.message
@@ -58,24 +57,4 @@ class SearchViewModel(private val repository: QuestionRepository) : ViewModel() 
             }
         }
     }
-
-    fun filterQuery() {
-        if (selectedChips.value.isNullOrEmpty()) {
-            if (_allQuestions.value != null) {
-                _filteredQuestions.value = _allQuestions.value
-            }
-        } else {
-            val updatedQuestions = mutableListOf<Question>()
-            for (question in _allQuestions.value?.data!!) {
-                for (tag in question.tags!!) {
-                    if (selectedChips.value!!.contains(tag)) {
-                        updatedQuestions.add(question)
-                        break
-                    }
-                }
-            }
-            _filteredQuestions.value = Resource.Success(updatedQuestions)
-        }
-    }
-
 }

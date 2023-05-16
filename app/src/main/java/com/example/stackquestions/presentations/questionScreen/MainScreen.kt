@@ -45,7 +45,7 @@ fun MainScreen(questionViewModel: QuestionViewModel, searchViewModel: SearchView
                 .fillMaxWidth()
                 .padding(it)
         ) {
-            if (searchQuery.isEmpty()) {
+            if (searchViewModel.selectedChips.value.isNullOrEmpty() && searchQuery.isEmpty()) {
                 ManageSearchQueryEmpty(questionViewModel)
                 PullRefreshIndicator(refreshing = refreshing?:false, state = ptrState, modifier = Modifier.align(Alignment.TopCenter))
             } else {

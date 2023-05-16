@@ -13,7 +13,7 @@ interface StackExchangeApiService{
         @Query("site") site: String = "stackoverflow"
     ): QuestionResponse
 
-    @GET("search/advanced?pagesize=100&order=activity&sort=creation")
+    @GET("search/advanced?pagesize=100&order=desc&sort=creation")
     suspend fun getFilteredQuestions(
         @Query("q") searchQuery:String,
         @Query("apikey") key: String = API_KEY,

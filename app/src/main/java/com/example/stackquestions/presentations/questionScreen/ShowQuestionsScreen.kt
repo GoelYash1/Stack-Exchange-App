@@ -39,6 +39,7 @@ fun ManageSearchQueryEmpty(
     questionViewModel: QuestionViewModel
 ) {
     val questions by questionViewModel.questions.observeAsState()
+
     when (questions) {
         is Resource.Success -> {
             val questionList = (questions as Resource.Success<List<Question>>).data
@@ -123,19 +124,39 @@ fun ManageSearchQueryNotEmpty(
     searchViewModel: SearchViewModel
 ) {
     val filteredQuestions by searchViewModel.filteredQuestions.observeAsState()
+    val selectedTags = searchViewModel.selectedChips.value ?: emptySet()
+
     when (filteredQuestions) {
         is Resource.Success -> {
-            val questionList = ((filteredQuestions as Resource.Success<List<Question>>).data)
-            if (questionList!=null){
+            val questionList = (filteredQuestions as Resource.Success<List<Question>>).data
+            val filteredList = if (selectedTags.isNotEmpty()) {
+                questionList?.filter { question ->
+                    question.tags.any { selectedTags.contains(it) }
+                }
+            } else {
+                questionList
+            }
+
+            if (!filteredList.isNullOrEmpty()) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    itemsIndexed(questionList) { index, question ->
+                    itemsIndexed(filteredList) { index, question ->
                         DisplayQuestionItemUI(question = question, questionViewModel)
-                        if ((index + 1) % 5 == 0 && index != questionList.lastIndex) {
+                        if ((index + 1) % 5 == 0 && index != filteredList.lastIndex) {
                             AdComponent()
                         }
                     }
+                }
+            } else {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Text(
+                        text = "No matching search results found :(",
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }
@@ -147,13 +168,13 @@ fun ManageSearchQueryNotEmpty(
                 CircularProgressIndicator()
             }
         }
-        is Resource.Error ->{
+        is Resource.Error -> {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxSize()
             ) {
                 Text(
-                    text = "Error, try reloading\n" + searchViewModel.errorMessage.value.toString(),
+                    text = "Error occurred while loading questions.\n${searchViewModel.errorMessage.value}",
                     textAlign = TextAlign.Center
                 )
             }
@@ -164,7 +185,7 @@ fun ManageSearchQueryNotEmpty(
                 modifier = Modifier.fillMaxSize()
             ) {
                 Text(
-                    text = "Did Not match any Search Results :(",
+                    text = "No matching search results found :(",
                     textAlign = TextAlign.Center
                 )
             }
