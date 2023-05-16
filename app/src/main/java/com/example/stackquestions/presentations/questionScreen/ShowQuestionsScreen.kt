@@ -130,8 +130,11 @@ fun ManageSearchQueryNotEmpty(
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(questionList) { question ->
-                        DisplayQuestionItemUI(question = question,questionViewModel)
+                    itemsIndexed(questionList) { index, question ->
+                        DisplayQuestionItemUI(question = question, questionViewModel)
+                        if ((index + 1) % 5 == 0 && index != questionList.lastIndex) {
+                            AdComponent()
+                        }
                     }
                 }
             }
@@ -150,7 +153,7 @@ fun ManageSearchQueryNotEmpty(
                 modifier = Modifier.fillMaxSize()
             ) {
                 Text(
-                    text = "Error loading questions.",
+                    text = "Error, try reloading\n" + searchViewModel.errorMessage.value.toString(),
                     textAlign = TextAlign.Center
                 )
             }

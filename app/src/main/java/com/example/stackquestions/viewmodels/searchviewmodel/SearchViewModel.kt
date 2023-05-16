@@ -45,11 +45,11 @@ class SearchViewModel(private val repository: QuestionRepository) : ViewModel() 
                                 .toMutableList()
                         _tagsList.value = newList
                         _allQuestions.value = Resource.Success(resource.data)
-                        _filteredQuestions.value = resource
+                        _filteredQuestions.value = Resource.Success(resource.data)
                     }
 
                     is Resource.Error -> {
-                        _filteredQuestions.value = resource
+                        _filteredQuestions.value = Resource.Error(Throwable(), null)
                         _tagsList.value = mutableListOf()
                         _allQuestions.value = Resource.Success(listOf())
                         _errorMessage.value = resource.error?.message
@@ -60,7 +60,7 @@ class SearchViewModel(private val repository: QuestionRepository) : ViewModel() 
     }
 
     fun filterQuery() {
-        if (selectedChips.value == null || selectedChips.value?.isEmpty() == true) {
+        if (selectedChips.value.isNullOrEmpty()) {
             if (_allQuestions.value != null) {
                 _filteredQuestions.value = _allQuestions.value
             }
