@@ -136,6 +136,7 @@ fun ManageSearchQueryNotEmpty(
             Button(onClick = {
                 selectedTags = emptySet() // Clear the selectedTags
                 searchViewModel.selectedChips.value?.clear()
+                questionViewModel.updateQuestions()
             }, shape = CircleShape) {
                 Text(text = "Clear Filters")
             }

@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.stackquestions.data.models.Question
 import com.example.stackquestions.presentations.webviewscreen.WebViewScreen
 import com.example.stackquestions.viewmodels.questionviewmodel.QuestionViewModel
@@ -141,33 +142,56 @@ fun FavouriteQuestionScreen(questionViewModel: QuestionViewModel) {
 
 @Composable
 fun FavouriteQuestionItem(item: Question) {
+    val showWebViewDialog = remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
+            .clickable {
+                showWebViewDialog.value = true
+            }
             .padding(16.dp)
             .fillMaxWidth()
-            .border(2.dp, Color.Black, RoundedCornerShape(10.dp))
-    ) {
-        Column(Modifier.padding(10.dp)) {
-            Text(text = item.owner.display_name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(text = item.title, fontSize = 14.sp, fontWeight = FontWeight.Medium, lineHeight = 13.sp)
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                contentPadding = PaddingValues(vertical = 4.dp)
-            ) {
-                items(item.tags) { tag ->
-                    Text(
-                        text = "#$tag",
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
-                        fontSize = 12.sp
+            .border(2.dp, Color.Black, RoundedCornerShape(10.dp)),
+        content = {
+            Column(Modifier.padding(10.dp)) {
+                Text(text = item.owner.display_name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(text = item.title, fontSize = 14.sp, fontWeight = FontWeight.Medium, lineHeight = 13.sp)
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    contentPadding = PaddingValues(vertical = 4.dp)
+                ) {
+                    items(item.tags) { tag ->
+                        Text(
+                            text = "#$tag",
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                    Text(text = "${item.view_count} views")
+                    Text(text = "Answered: ${item.is_answered}")
+                    Text(text = "${item.answer_count} answers")
+                }
+            }
+            if (showWebViewDialog.value) {
+                Dialog(
+                    onDismissRequest = { showWebViewDialog.value = false }
+                ) {
+                    AlertDialog(
+                        onDismissRequest = { showWebViewDialog.value = false },
+                        title = { Text(text = "Web View") },
+                        text = {
+                            WebViewScreen(url = item.link)
+                        },
+                        confirmButton = {
+                            Button(onClick = { showWebViewDialog.value = false }) {
+                                Text(text = "Close")
+                            }
+                        }
                     )
                 }
             }
-            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                Text(text = "${item.view_count} views")
-                Text(text = "Answered: ${item.is_answered}")
-                Text(text = "${item.answer_count} answers")
-            }
         }
-    }
+    )
 }
