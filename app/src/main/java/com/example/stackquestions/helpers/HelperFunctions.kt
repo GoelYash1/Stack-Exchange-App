@@ -53,10 +53,7 @@ object HelperFunctions {
             else -> "${duration.seconds} sec${if (duration.seconds > 1) "s" else ""} ago"
         }
     }
-    fun hideKeyboard(context: Context, view: View?) {
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view?.windowToken, 0)
-    }
+
     @Composable
     fun LoadImageFromUrl(imageUrl: String) {
         val context = LocalContext.current
